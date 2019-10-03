@@ -61,6 +61,7 @@
          const modelo = leeModelo();
          const respuestaHttp = await fetch(
            "saludo?fecha=" + encodeURIComponent(modelo.fecha)
+           + "&genero=" + encodeURIComponent(modelo.genero)
            + "&nombre2=" + encodeURIComponent(modelo.nombre2));
          if (respuestaHttp.ok) {
            const respuestaTexto = await respuestaHttp.text();
@@ -80,5 +81,8 @@
        };
      }
    </script>
+   <footer>
+     <small>Copyright &copy;2019 Paez Paredes Jesus Sebastian</small>
+   </footer>
  </body>
 </html>
