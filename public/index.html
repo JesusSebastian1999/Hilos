@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+ <head>
+   <meta charset="utf-8">
+   <title>Ejempo de Hilos</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <style>
+     body {
+       font-family: sans-serif
+     }
+   </style>
+   <script src="/__/firebase/6.0.2/firebase-app.js"></script>
+   <script src="/__/firebase/6.0.2/firebase-functions.js"></script>
+   <script src="/__/firebase/init.js"></script>
+ </head>
+ <body>
+   <h1>Ejempo de Hilos</h1>
+   <form name="vista">
+     <p>
+       Fecha de Nacimiento
+       <input type="date" name="fecha" required 
+         accesskey="1">
+     </p>
+     <p>
+       Nombres
+       <input type="text" name="nombre2" required placeholder="Nombre 2"
+         accesskey="2">
+     </p>
+     <p>
+        Genero Musical</br>
+        <input type="radio" name="genero" value="Rock" required>Rock
+      </p>
+      <p>
+          <input type="radio" name="genero" value="J-pop" required>J-pop
+      </p>
+      <p>
+          <input type="radio" name="genero" value="Electronica" required>Electronica
+      </p>
+     <p><output name="respuesta"></output></p>
+     <p>
+       <button type="submit">Aceptar (Hilos)</button>
+       <button type="button" name="saludaHttp">Aceptar (Http)</button>
+     </p>
+   </form>
+   <script>
+     "use strict";
+     const hilo = new Worker("wwSaludo.js");
+     document.vista.addEventListener("submit", saludaHilo);
+     document.vista.saludaHttp.addEventListener("click", saludaHttp);
+     hilo.addEventListener("message", evt => muestraRespuesta(evt.data));
+     function muestraRespuesta(respuesta) {
+       document.vista.respuesta.value = respuesta;
+     }
+     function saludaHilo(evt) {
+       evt.preventDefault();
+       const modelo = leeModelo();
+       hilo.postMessage(modelo);
+     }
+     async function saludaHttp() {
+       try {
+         const modelo = leeModelo();
+         const respuestaHttp = await fetch(
+           "saludo?fecha=" + encodeURIComponent(modelo.fecha)
+           + "&nombre2=" + encodeURIComponent(modelo.nombre2));
+         if (respuestaHttp.ok) {
+           const respuestaTexto = await respuestaHttp.text();
+           muestraRespuesta(respuestaTexto);
+         } else {
+           throw new Error(respuestaHttp.statusText);
+         }
+       } catch (e) {
+         muestraRespuesta(e.message);
+       }
+     }
+     function leeModelo() {
+       return {
+         fecha: document.vista.fecha.value,
+         genero: document.vista.genero.value,
+         nombre2: document.vista.nombre2.value.trim()
+       };
+     }
+   </script>
+ </body>
+</html>
